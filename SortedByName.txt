@@ -1,0 +1,19 @@
+---INSERTION SORT---
+Running time: 0ms
+
+Student Name: Ali
+Student ID: 3541
+Student GPA: 3.5
+
+Student Name: Mariam
+Student ID: 69712
+Student GPA: 3.7
+
+Student Name: Mohamed Kamal
+Student ID: 97848
+Student GPA: 2.2
+
+Student Name: Sara Ahmed
+Student ID: 78697
+Student GPA: 3.1
+
