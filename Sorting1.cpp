@@ -19,7 +19,7 @@ public:
         name = n;
         gpa = GPA;
     }
-    bool operator<(const Student& other){ // To sort by name.
+    bool operator<(Student& other){ // To sort by name.
         return this->name < other.name;
     }
     // Overloading printing operator.
@@ -167,6 +167,35 @@ void MergeSort(vector<T>& A, int left, int right) {
     output << "Running time: "<< duration.count() << "ms" << endl << endl;
 
 }
+template<typename T>
+int Partition(vector<T>& arr, int left, int right) {
+    T x = arr[left]; // Pivot element
+    int i = left;
+
+    for (int j = left + 1; j <= right; j++) {
+        if (arr[j] < x) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+
+    swap(arr[i], arr[left]);
+    return i;
+}
+template<typename T>
+void quicksort(vector<T>& arr,int l,int h){
+    output << "---QUICK SORT---" << endl;
+    auto start = high_resolution_clock::now();
+    if(l < h){
+        int part = Partition(arr,l,h);
+        quicksort(arr,l,part-1);
+        quicksort(arr,part+1,h);
+    }
+     auto end = high_resolution_clock::now(); // Stop the timer.
+    auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
+    output << "Running time: "<< duration.count() << "ms" << endl << endl;
+}
+
 int main()
 {
 
@@ -193,7 +222,7 @@ int main()
         }
 
     }
-    insertionsort(Students,Students.size());
+    quicksort(Students,0,Students.size()-1);
     if(output.is_open()){
     for(int i =0; i<Students.size(); i++){
         output << Students[i] << endl; // Put sorted info of students into the file.
