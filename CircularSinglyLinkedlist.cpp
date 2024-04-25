@@ -145,6 +145,13 @@ public:
         }
         return false;
     }
+  
+    void swap(int firstItemIdx, int secondItemIdx){
+        if (firstItemIdx < 0 || firstItemIdx >= size || secondItemIdx < 0 || secondItemIdx >= size) {
+            throw out_of_range("Index out of bounds");}
+        else if (firstItemIdx == secondItemIdx) {return;}
+        
+    }
     bool isItemAtEqual (Type element, int index){
         return retrieveAt(index) == element;}
     bool isEmpty(){
