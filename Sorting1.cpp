@@ -8,6 +8,8 @@
 
 using namespace std;
 using namespace std::chrono;
+int comparsion_count_quicksort = 0;
+int comparsion_count_mergesort = 0;
 ofstream output("SortedByName.txt");
 class Student{
 public:
@@ -118,14 +120,14 @@ void Merge(vector<T>& A, int left, int middle, int right) {
     int n2 = right - middle;
 
     // Create temporary arrays
-    vector<T> LeftArray(n1);
-    vector<T> RightArray(n2);
+    vector<T> LeftArray;
+    vector<T> RightArray;
 
     // Copy data to temporary arrays LeftArray[] and RightArray[]
     for (int i = 0; i < n1; ++i)
-        LeftArray[i] = A[left + i];
+        LeftArray.push_back(A[left + i]);
     for (int j = 0; j < n2; ++j)
-        RightArray[j] = A[middle + 1 + j];
+        RightArray.push_back(A[middle + 1 + j]);
 
     // Merge the temporary arrays back into A[left..right]
     int i = 0, j = 0, k = left;
@@ -138,6 +140,7 @@ void Merge(vector<T>& A, int left, int middle, int right) {
             ++j;
         }
         ++k;
+        comparsion_count_mergesort++;
     }
 
     // Copy the remaining elements of LeftArray[], if any
@@ -169,18 +172,21 @@ void MergeSort(vector<T>& A, int left, int right) {
         // Merge the sorted halves
         Merge(A, left, middle, right);
     }
+    else{
+        return;
+    }
 }
 template<typename T>
-int Partition(vector<T>& arr, int left, int right,int comparsion=0) {
+int Partition(vector<T>& arr, int left, int right) {
     T x = arr[left]; // Pivot element
     int i = left;
 
     for (int j = left + 1; j <= right; j++) {
+            comparsion_count_quicksort++;
         if (arr[j] < x) {
             i++;
             swap(arr[i], arr[j]);
         }
-        comparsion++;
     }
 
     swap(arr[i], arr[left]);
@@ -188,20 +194,24 @@ int Partition(vector<T>& arr, int left, int right,int comparsion=0) {
 }
 template<typename T>
 void quicksort(vector<T>& arr,int l,int h){
-    int comparsion =0;
-    output << "---QUICK SORT---" << endl;
-    auto start = high_resolution_clock::now();
     if(l < h){
-        int part = Partition(arr,l,h,comparsion);
+        int part = Partition(arr,l,h);
         quicksort(arr,l,part-1);
         quicksort(arr,part+1,h);
     }
-     auto end = high_resolution_clock::now(); // Stop the timer.
-    auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
-    output << "Running time: "<< duration.count() << "ms" << endl << endl;
-    output << "Number of comparsions: " << comparsion << endl;
-}
 
+
+}
+void outputquicksort(){
+    output << "--- QUICK SORT---" << endl;
+    output << "Number of comparsions: " << comparsion_count_quicksort << endl;
+
+}
+void outputmergesort(){
+    output << "---MERGE SORT---" << endl;
+    output << "Number of comparsions: " << comparsion_count_mergesort << endl;
+
+}
 int main()
 {
 
@@ -256,13 +266,29 @@ int main()
     }
 
     }
+      auto start = high_resolution_clock::now();
      quicksort(Students,0,Students.size()-1);
+     outputquicksort();
+    auto end = high_resolution_clock::now(); // Stop the timer.
+    auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
+    output << "Running time: "<< duration.count() << "ms" << endl << endl;
     if(output.is_open()){
     for(int i =0; i<Students.size(); i++){
         output << Students[i] << endl; // Put sorted info of students into the file.
     }
 
     }
+    auto start2 = high_resolution_clock::now();
+    MergeSort(Students,0,Students.size()-1);
+    outputmergesort();
+    auto end2 = high_resolution_clock::now(); // Stop the timer.
+    auto duration2 = duration_cast<milliseconds>(end2 - start2); // output timer in millisec.
+    output << "Running time: "<< duration2.count() << "ms" << endl << endl;
+    if(output.is_open()){
+    for(int i =0; i<Students.size(); i++){
+        output << Students[i] << endl; // Put sorted info of students into the file.
+    }
 
+    }
      output.close();
 }
