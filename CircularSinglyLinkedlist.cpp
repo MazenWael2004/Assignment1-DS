@@ -146,11 +146,32 @@ public:
         return false;
     }
   
-    void swap(int firstItemIdx, int secondItemIdx){
+    void swap(int firstItemIdx, int secondItemIdx) {
         if (firstItemIdx < 0 || firstItemIdx >= size || secondItemIdx < 0 || secondItemIdx >= size) {
-            throw out_of_range("Index out of bounds");}
-        else if (firstItemIdx == secondItemIdx) {return;}
-        
+            throw out_of_range("OUT OF RANGE");
+        } else if (firstItemIdx == secondItemIdx) {return;}
+        Node<Type>* prev1 = nullptr;
+        Node<Type>* prev2 = nullptr;
+        Node<Type>* first,*second ;
+        Node<Type>* curr = head;
+        for (int i = 0; i < firstItemIdx; i++) {
+            prev1 = curr;
+            curr = curr->Next;
+        }first = curr;
+        curr = head;
+        for (int i = 0; i < secondItemIdx; i++) {
+            prev2 = curr;
+            curr = curr->Next;
+        } second = curr;
+        if (prev1 != nullptr) { prev1->Next = second;}
+        if (prev2 != nullptr) { prev2->Next = first;}
+        Node<Type>* Tmp = first->Next;
+        first->Next = second->Next;
+        second->Next = Tmp;
+        if (first == head) { head = second;}
+        if (first == tail) { tail = second;}
+        if (second == head) { head = first;}
+        if (second == tail) { tail = first;}
     }
     bool isItemAtEqual (Type element, int index){
         return retrieveAt(index) == element;}
