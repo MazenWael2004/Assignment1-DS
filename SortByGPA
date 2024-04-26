@@ -4,20 +4,21 @@
 #include <chrono>
 using namespace std;
 using namespace std::chrono;
-ofstream file("SortedByName.txt");
+
+
 //class student and it''s constructor
 class Student{
 public:
     string id;
     string name;
     double gpa;
-    Student() :  name("Unknown"),id(0),gpa(0.0) {}
-    Student(string n,string ID,double GPA){
+    Student() :  name("Unknown"),id(""),gpa(0.0) {}//default constructor
+    Student(string n,string ID,double GPA){//parameterized constructor
         name = n;
         id = ID;
         gpa = GPA;
     }
-    bool operator>(Student& other){ // To sort by name.
+    bool operator>(Student& other){ // To sort by GPA in descending order.
         return this->gpa > other.gpa;
     }
     bool operator<=(const Student& other) const {
@@ -28,6 +29,7 @@ public:
         return OS;
     }
 };
+//--------------------------------------------------------------------------------------------------------------------------------------------
 //read from file
 vector<Student> readStudents(const string& filename) {
     ifstream file(filename);
@@ -46,22 +48,27 @@ vector<Student> readStudents(const string& filename) {
 
     return students;
 }
+//---------------------------------------------------------------------------------------------------------------------------------------------------------
+//write to file
 void writeSortedResults(const string& filename, const string& algorithmName, const int& comparisons,double runningTime, const vector<Student>& students) {
     ofstream file(filename, ios::app); // Append to file
     if (!file.is_open()) {
         cerr << "Could not open file: " << filename << endl;
         return;
     }
-    file << "\n----------------------------\n" ;
     file << "Algorithm: " << algorithmName << "\n";
     file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
     file << "Running Time: " << runningTime * 1000 << " milliseconds\n"; // Convert to milliseconds
     for (const auto& student : students) {
         file << student;
     }
+    file << "\n----------------------------\n" ;
 }
 
 //templates of sorting algorithms
+//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Insertion Sort
 template <typename T>
 vector<T> insertion_sort(vector<T>&Students,int& comparisons){
     int n=Students.size();
@@ -74,9 +81,13 @@ vector<T> insertion_sort(vector<T>&Students,int& comparisons){
             j--;
             comparisons++;
         }
-    }file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
+    }
+//    file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
     return Students;
 }
+//-----------------------------------------------------------------------------------------------------------------------------------------
+
+//Selection Sort
 template<typename T>
 vector<T> selection_sort(vector<T>&Students,int& comparisons){
     int n=Students.size();
@@ -88,9 +99,17 @@ vector<T> selection_sort(vector<T>&Students,int& comparisons){
                 comparisons++;
             }
         }
-    }file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
+        if(mx_inx!=i){
+            T temp=Students[i];
+            Students[i] = Students[mx_inx];
+            Students[mx_inx] = temp;
+        }
+    }
     return Students;
 }
+//----------------------------------------------------------------------------------------------------------------------------------
+
+//Bubble Sort
 template<typename T>
 vector<T> bubble_sort(vector<T>&Students,int& comparisons){
     int n=Students.size();
@@ -107,9 +126,13 @@ vector<T> bubble_sort(vector<T>&Students,int& comparisons){
             comparisons++;
         }
         if (!swapped) break;
-    }file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
+    }
+//    file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
     return Students;
 }
+//------------------------------------------------------------------------------------------------------------------------------
+
+//Shell Sort
 template<typename T>
 vector<T> shell_sort(vector<T>&Students,int& comparisons){
     int n=Students.size();
@@ -123,10 +146,12 @@ vector<T> shell_sort(vector<T>&Students,int& comparisons){
             }
             Students[j] = temp;
         }
-    }file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
+    }
+//    file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
     return Students;
 }
-//---------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------
+//Merge Sort
 template<typename T>
 vector<T> merge_sort(vector<T>& Students, int left, int right, int& comparisons) {
     if (left >= right) {
@@ -164,12 +189,14 @@ vector<T> merge_sort(vector<T>& Students, int left, int right, int& comparisons)
     while (idxR < R.size()) {
         merged.push_back(R[idxR]);
         idxR++;
-    }file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
+    }
+//    file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
 
     return merged; // Return the merged vector in descending order
 }
 //----------------------------------------------------------------------------------------------------------------------------
 
+//Quick Sort
 template<typename T>
 int Partition(vector<T>&Students,int left,int right,int& comparisons){
     T x=Students[left];
@@ -196,31 +223,37 @@ vector<T> quick_sort(vector<T>&Students,int left,int right,int& comparisons){
         int middle= Partition(Students,left,right,comparisons);
         quick_sort(Students,left,middle-1,comparisons);
         quick_sort(Students,middle+1,right,comparisons);
-    }file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
+    }
+//    file<<"The Number Of Comparisons is : "<<comparisons<<"\n";
     return Students;
 }
-//template<typename T>
-//vector<T> count_Sort(vector<T>& Students,int mx) {
-//    int n=Students.size();
-//    int mx=0;
-//    int comparisons=0;
-//    for(const auto &item:Students){
-//        if(item>mx){mx=item;}
-//    }
-//   vector<int> count(mx + 1, 0);
-//    for(int i=0;i<n;i++){
-//        count[Students[i]]++;
-//    }for(int i=1;i<mx;i++){
-//        count[i]+=count[i-1];
-//    }vector<T>out(n);
-//    for(int i=n-1;n>=0;i--){
-//        out[count[Students[i]--]-1]=Students[i];
-//    }
-//    return out;
-//}
 
-//write to file
+//----------------------------------------------------------------------------------------------------------------------
 
+//Count Sort
+template<typename T>
+vector<T> count_Sort(vector<T>& Students, int mx, int& comparisons) {
+    int n = Students.size();
+    vector<int> count(mx + 1, 0); // Adjust size to mx + 1
+    for (int i = 0; i < n; i++) {
+        int scaledGPA = static_cast<int>(Students[i].gpa ); // Convert GPA to integer
+        count[scaledGPA]++;
+        comparisons++; // Increment comparisons for each element processed
+    }
+    for (int i = 1; i <= mx; i++) { // Adjust loop condition
+        count[i] += count[i - 1];
+    }
+    vector<T> out(n);
+    for (int i = n - 1; i >= 0; i--) { // Iterate backward to maintain stability
+        int scaledGPA = static_cast<int>(Students[i].gpa ); // Convert GPA to integer
+        int index = count[scaledGPA]; // Use and decrement the count to find the final index
+        out[index-1] = Students[i];
+        count[scaledGPA]--;
+        comparisons++; // Increment comparisons for each element placed
+    }
+    return out;
+}
+//------------------------------------------------------------------------------------------------
 
 
 int main() {
@@ -228,41 +261,41 @@ int main() {
 
     // Insertion Sort
     auto start = chrono::high_resolution_clock::now();
-    int comparisons=0;
-    vector<Student> insertionSorted = insertion_sort(students,comparisons);
+    int comparisons = 0;
+    vector<Student> insertionSorted = insertion_sort(students, comparisons);
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> insertionTime = end - start;
-    writeSortedResults("SortedByGPA.txt", "Insertion Sort",comparisons, insertionTime.count(), insertionSorted);
+    writeSortedResults("SortedByGPA.txt", "Insertion Sort", comparisons, insertionTime.count(), insertionSorted);
     students.clear();
 
     // Selection Sort
     students = readStudents("students.txt");
     start = chrono::high_resolution_clock::now();
-    comparisons=0;
-    vector<Student> selectionSorted = selection_sort(students,comparisons);
+    comparisons = 0;
+    vector<Student> selectionSorted = selection_sort(students, comparisons);
     end = chrono::high_resolution_clock::now();
     chrono::duration<double> selectionTime = end - start;
-    writeSortedResults("SortedByGPA.txt", "Selection Sort",comparisons, selectionTime.count(), selectionSorted);
+    writeSortedResults("SortedByGPA.txt", "Selection Sort", comparisons, selectionTime.count(), selectionSorted);
     students.clear();
 
     // Bubble Sort
     students = readStudents("students.txt");
     start = chrono::high_resolution_clock::now();
-    comparisons=0;
-    vector<Student> bubblesort = bubble_sort(students,comparisons);
+    comparisons = 0;
+    vector<Student> bubblesort = bubble_sort(students, comparisons);
     end = chrono::high_resolution_clock::now();
     chrono::duration<double> bubbleTime = end - start;
-    writeSortedResults("SortedByGPA.txt", "Bubble Sort",comparisons, bubbleTime.count(), bubblesort);
+    writeSortedResults("SortedByGPA.txt", "Bubble Sort", comparisons, bubbleTime.count(), bubblesort);
     students.clear();
 
     //Shell sort
     students = readStudents("students.txt");
     start = chrono::high_resolution_clock::now();
-    comparisons=0;
-    vector<Student> shellsort = shell_sort(students,comparisons);
+    comparisons = 0;
+    vector<Student> shellsort = shell_sort(students, comparisons);
     end = chrono::high_resolution_clock::now();
     chrono::duration<double> shellTime = end - start;
-    writeSortedResults("SortedByGPA.txt", "Shell Sort",comparisons, shellTime.count(), shellsort);
+    writeSortedResults("SortedByGPA.txt", "Shell Sort", comparisons, shellTime.count(), shellsort);
     students.clear();
 
     //Merge sort
@@ -272,32 +305,34 @@ int main() {
     vector<Student> mergesort = merge_sort(students, 0, students.size() - 1, comparisons);
     end = chrono::high_resolution_clock::now();
     chrono::duration<double> mergeTime = end - start;
-    writeSortedResults("SortedByGPA.txt", "Merge Sort",comparisons, mergeTime.count(), mergesort);
+    writeSortedResults("SortedByGPA.txt", "Merge Sort", comparisons, mergeTime.count(), mergesort);
     students.clear();
 
     //Quick sort
     students = readStudents("students.txt");
     start = chrono::high_resolution_clock::now();
-    comparisons=0;
-    vector<Student> quicksort = quick_sort(students,0,students.size()-1,comparisons);
+    comparisons = 0;
+    vector<Student> quicksort = quick_sort(students, 0, students.size() - 1, comparisons);
     end = chrono::high_resolution_clock::now();
     chrono::duration<double> quickTime = end - start;
-    writeSortedResults("SortedByGPA.txt", "Quick Sort",comparisons, quickTime.count(), quicksort);
+    writeSortedResults("SortedByGPA.txt", "Quick Sort", comparisons, quickTime.count(), quicksort);
+    students.clear();
+
     //Count sort
-
-//    start = chrono::high_resolution_clock::now();
-//    int mx=0;
-//    for (const auto& student : students) {
-//        if (student.gpa > mx) {
-//            mx = student.gpa;
-//        }
-//    }
-//    vector<Student> countsort = count_Sort(students,mx);
-//    end = chrono::high_resolution_clock::now();
-//    chrono::duration<double> countTime = end - start;
-//    writeSortedResults("SortedByGPA.txt", "Count Sort", countTime.count(), countsort);
-
-
+    students = readStudents("students.txt");
+    start = chrono::high_resolution_clock::now();
+    int mx = 0;
+    comparisons = 0;
+    for (const auto &student: students) {
+        if (student.gpa > mx) {
+            mx = student.gpa;
+        }
+    }
+    vector<Student> countsort = count_Sort(students, mx, comparisons);
+    end = chrono::high_resolution_clock::now();
+    chrono::duration<double> countTime = end - start;
+    writeSortedResults("SortedByGPA.txt", "Count Sort", comparisons, countTime.count(), countsort);
+    students.clear();
 
     return 0;
 }
