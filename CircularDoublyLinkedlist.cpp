@@ -194,9 +194,73 @@ public:
     }
 
     void swap(int firstItemIdx, int secondItemIdx) {
-        if (firstItemIdx < 0 || firstItemIdx >= size || secondItemIdx < 0 || secondItemIdx >= size) {
+        if (firstItemIdx < 0 || firstItemIdx >= size|| secondItemIdx < 0 || secondItemIdx >= size) {
             cout << "Invalid indices\n";
             return;
+        }
+        if (firstItemIdx == secondItemIdx) {
+            cout << "Indices are the same\n";
+            return;
+        }
+
+        node<T>* firstNode = head;
+        node<T>* secondNode = head;
+        int c = 0;
+        while (c != firstItemIdx) {
+            firstNode = firstNode->next;
+            c++;
+        }
+        c = 0;
+        while (c != secondItemIdx) {
+            secondNode = secondNode->next;
+            c++;
+        }
+
+        if (firstNode->next == secondNode) {
+            if (firstNode->prev != NULL) {
+                firstNode->prev->next = secondNode;
+            } else {
+                head = secondNode;
+            }
+            if (secondNode->next != NULL) {
+                secondNode->next->prev = firstNode;
+            } else {
+                tail = firstNode;
+            }
+            firstNode->next = secondNode->next;
+            secondNode->prev = firstNode->prev;
+            firstNode->prev = secondNode;
+            secondNode->next = firstNode;
+        }  else {
+            node<T>* temp = firstNode->prev;
+            firstNode->prev = secondNode->prev;
+            secondNode->prev = temp;
+
+            temp = firstNode->next;
+            firstNode->next = secondNode->next;
+            secondNode->next = temp;
+
+            if (firstNode->next != NULL) {
+                firstNode->next->prev = firstNode;
+            } else {
+                tail = firstNode;
+            }
+            if (secondNode->next != NULL) {
+                secondNode->next->prev = secondNode;
+            } else {
+                tail = secondNode;
+            }
+
+            if (firstNode->prev != NULL) {
+                firstNode->prev->next = firstNode;
+            } else {
+                head = firstNode;
+            }
+            if (secondNode->prev != NULL) {
+                secondNode->prev->next = secondNode;
+            } else {
+                head = secondNode;
+            }
         }
     }
 };
