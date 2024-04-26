@@ -22,6 +22,7 @@ public:
     bool operator<(Student& other){ // To sort by name.
         return this->name < other.name;
     }
+
     // Overloading printing operator.
     friend ostream& operator<<(ostream& COUT,const Student& s){
         COUT << "Student Name: " << s.name << endl;
@@ -32,6 +33,7 @@ public:
 };
 template <typename T>
 void insertionsort(vector<T>& data, int n) {
+    int comparsions = 0;
     auto start = high_resolution_clock::now();// Start the timer before implementation of algorithm
     output << "---INSERTION SORT---" << endl;
     int j;
@@ -41,16 +43,18 @@ void insertionsort(vector<T>& data, int n) {
         j = i;
         for (j; j >= 0 && temp < data[j - 1]; j--) { // the loop condition.
             data[j] = data[j - 1]; // Shift.
+            comparsions++;
         }
         data[j] = temp; // Put the current element in its correct position.
     }
     auto end = high_resolution_clock::now(); // Stop the timer.
     auto duration = duration_cast<milliseconds>(end - start);
-
+    output << "Number of comparsions: " << comparsions << endl;
     output << "Running time: "<< duration.count() << "ms" << endl << endl;
 }
 template <typename T>
 void bubble_sort(vector<T>& data,int n){
+    int comparsion =0;
     auto start = high_resolution_clock::now();
     output << "---BUBBLE SORT---" << endl;
     for(int i =0; i<n-1; i++){
@@ -58,35 +62,38 @@ void bubble_sort(vector<T>& data,int n){
             if(data[j+1] < data[j]){
                 swap(data[j],data[j+1]);
             }
+             comparsion++;
         }
     }
-      auto end = high_resolution_clock::now(); // Stop the timer.
+    auto end = high_resolution_clock::now(); // Stop the timer.
     auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
-
+    output << "Number of comparsions: " << comparsion << endl;
     output << "Running time: "<< duration.count() << "ms" << endl << endl;
 }
 template <typename T>
-void selectionsort(vector<T>& data,int n){
+void selectionsort(vector<T>& data, int n) {
+    int comparsion = 0; // Initialize comparison counter
     auto start = high_resolution_clock::now();
     output << "---SELECTION SORT---" << endl;
-    int minindx;
-    for(int i =0; i<n-1; i++){
-       T mn = data[i]; // every iteration we assume that current element is minimum and every element on the left is sorted.
-        for(int j =i+1; j<n;j++){ // Compare it with its elements , check if its > any .
-            if(data[j] < mn){
-                mn = data[j]; // Then new min would be equal to that element
+    for (int i = 0; i < n - 1; i++) {
+        int minindx = i ;
+        for (int j = i + 1; j < n; j++) { // Compare it with its elements, check if it's less than any.
+            if (data[j] < data[minindx]) {
                 minindx = j; // Index of minimum element
             }
+            comparsion++; // Increment comparison counter.
         }
-        swap(data[i],data[minindx]); // Swap places.
+        swap(data[i], data[minindx]); // Swap places.
     }
-     auto end = high_resolution_clock::now(); // Stop the timer.
-    auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
-
-    output << "Running time: "<< duration.count() << "ms" << endl << endl;
+    auto end = high_resolution_clock::now(); // Stop the timer.
+    auto duration = duration_cast<milliseconds>(end - start); // Output timer in milliseconds.
+    output << "Number of comparisons: " << comparsion << endl;
+    output << "Running time: " << duration.count() << "ms" << endl << endl;
 }
+
 template <typename T>
 void shellsort(vector <T>& data,int n){
+    int comparsion = 0;
     auto start = high_resolution_clock::now();
     output << "---SHELL SORT---" << endl;
     int j;
@@ -96,15 +103,17 @@ void shellsort(vector <T>& data,int n){
            for(j = i; j>= gap && temp < data[j-gap]; j-=gap ){
             data[j] = data[j-gap];
            }
+           comparsion++;
            data[j] = temp;
         }
     }
      auto end = high_resolution_clock::now(); // Stop the timer.
     auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
+    output << "Number of comparsions: " << comparsion << endl;
     output << "Running time: "<< duration.count() << "ms" << endl << endl;
 }
-template <typename T>
-void Merge(vector<T>& A, int left, int middle, int right){
+template<typename T>
+void Merge(vector<T>& A, int left, int middle, int right) {
     int n1 = middle - left + 1;
     int n2 = right - middle;
 
@@ -121,7 +130,7 @@ void Merge(vector<T>& A, int left, int middle, int right){
     // Merge the temporary arrays back into A[left..right]
     int i = 0, j = 0, k = left;
     while (i < n1 && j < n2) {
-        if (LeftArray[i] <= RightArray[j]) {
+        if (LeftArray[i] < RightArray[j]) {
             A[k] = LeftArray[i];
             ++i;
         } else {
@@ -149,26 +158,20 @@ void Merge(vector<T>& A, int left, int middle, int right){
 // Merge-Sort function
 template <typename T>
 void MergeSort(vector<T>& A, int left, int right) {
-     auto start = high_resolution_clock::now();
-    output << "---MERGE SORT---" << endl;
     if (left < right) {
         // Find the middle point
         int middle = left + (right - left) / 2;
 
         // Sort first and second halves
         MergeSort(A, left, middle);
-        MergeSort(A, middle + 1, right);
+       MergeSort(A, middle + 1, right);
 
         // Merge the sorted halves
         Merge(A, left, middle, right);
     }
-     auto end = high_resolution_clock::now(); // Stop the timer.
-    auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
-    output << "Running time: "<< duration.count() << "ms" << endl << endl;
-
 }
 template<typename T>
-int Partition(vector<T>& arr, int left, int right) {
+int Partition(vector<T>& arr, int left, int right,int comparsion=0) {
     T x = arr[left]; // Pivot element
     int i = left;
 
@@ -177,6 +180,7 @@ int Partition(vector<T>& arr, int left, int right) {
             i++;
             swap(arr[i], arr[j]);
         }
+        comparsion++;
     }
 
     swap(arr[i], arr[left]);
@@ -184,16 +188,18 @@ int Partition(vector<T>& arr, int left, int right) {
 }
 template<typename T>
 void quicksort(vector<T>& arr,int l,int h){
+    int comparsion =0;
     output << "---QUICK SORT---" << endl;
     auto start = high_resolution_clock::now();
     if(l < h){
-        int part = Partition(arr,l,h);
+        int part = Partition(arr,l,h,comparsion);
         quicksort(arr,l,part-1);
         quicksort(arr,part+1,h);
     }
      auto end = high_resolution_clock::now(); // Stop the timer.
     auto duration = duration_cast<milliseconds>(end - start); // output timer in millisec.
     output << "Running time: "<< duration.count() << "ms" << endl << endl;
+    output << "Number of comparsions: " << comparsion << endl;
 }
 
 int main()
@@ -222,12 +228,41 @@ int main()
         }
 
     }
-    quicksort(Students,0,Students.size()-1);
+    bubble_sort(Students,Students.size());
     if(output.is_open()){
     for(int i =0; i<Students.size(); i++){
         output << Students[i] << endl; // Put sorted info of students into the file.
     }
-    output.close();
-    cout << "Sorted Students Successfully inserted into file." << endl;
+
     }
+    insertionsort(Students,Students.size());
+    if(output.is_open()){
+    for(int i =0; i<Students.size(); i++){
+        output << Students[i] << endl; // Put sorted info of students into the file.
+    }
+
+    }
+    selectionsort(Students,Students.size());
+    if(output.is_open()){
+    for(int i =0; i<Students.size(); i++){
+        output << Students[i] << endl; // Put sorted info of students into the file.
+    }
+
+    }
+     shellsort(Students,Students.size());
+    if(output.is_open()){
+    for(int i =0; i<Students.size(); i++){
+        output << Students[i] << endl; // Put sorted info of students into the file.
+    }
+
+    }
+     quicksort(Students,0,Students.size()-1);
+    if(output.is_open()){
+    for(int i =0; i<Students.size(); i++){
+        output << Students[i] << endl; // Put sorted info of students into the file.
+    }
+
+    }
+
+     output.close();
 }
